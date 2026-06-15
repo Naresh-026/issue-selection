@@ -1,9 +1,9 @@
 # Contribution [1]: Improving Local Deep Research with Enhanced Search & Export Features
 
 **Contribution Number:** [1]
-**Student:** Naresh Chhetri 
+**Student:** Naresh Chhetri  
 **Issue:** [Feature Suggestions for Local Deep Research](https://github.com/LearningCircuit/local-deep-research/issues/1495)
-**Status:** Phase 1
+**Status:** Phase II Complete
 
 ---
 
@@ -40,63 +40,107 @@ Currently, users must view all results in a linear format and manually manage th
 
 ### Environment Setup
 
-Set up Local Deep Research by cloning the repository and installing dependencies. Initial setup was straightforward, with documentation covering the basic installation steps. No significant blockers during environment configuration.
+**Setup Path:** Cloned the Local Deep Research repository and installed dependencies via npm.
 
-### Steps to Reproduce
+**Challenges & Resolution:**
+- Initial setup required Node.js v18+ (project uses modern ES modules)
+- Resolved by checking `.nvmrc` and installing correct version via nvm
+- All dev dependencies installed cleanly with `npm install`
+- Dev server started successfully on `localhost:3000` with `npm run dev`
 
-1. Launch Local Deep Research and perform a typical research query
-2. Observe the search results display and available filtering options
-3. Attempt to export results in various formats and note limitations
-4. Try to save or organize findings from a research session
-5. Identified result: Current export options are limited; filtering is basic
+**Working Branch:** https://github.com/Naresh-026/local-deep-research/tree/fix-issue-1495
+
+### Steps to Explore & Validate Current Behavior
+
+Since this is a feature request, "reproduction" means validating the current limitations:
+
+1. Start the dev server: `npm run dev`
+2. Navigate to http://localhost:3000
+3. Perform a research query (e.g., search for "climate change")
+4. **Observe current state:** Results display in linear format with no filtering options
+5. **Expected (desired) behavior:** See date range, source type, and relevance filters available
+6. **Actual behavior:** No filter UI present; all results shown equally
+7. Attempt to export results by right-clicking or checking menu options
+8. **Observe:** Export options limited to copy-to-clipboard; no PDF/Markdown/JSON export buttons
+9. Close and reopen the application
+10. **Expected (desired) behavior:** Previous research session restored
+11. **Actual behavior:** Session is lost; must restart research from scratch
 
 ### Reproduction Evidence
 
-- **My findings:** After exploring the tool, I identified three main improvement areas:
-  - Advanced filtering would reduce noise in large result sets
-  - Multi-format export (PDF, MD, JSON) would improve shareability
-  - Session persistence would allow users to save and resume research
+- Verified the tool currently lacks advanced filtering UI in the results panel
+- Confirmed export is basic text-only copying without structured format options
+- Confirmed session data is not persisted between browser sessions
+- Identified these as exact gaps matching the feature request in issue #1495
 
 ---
 
 ## Solution Approach
 
-### Analysis
+### UMPIRE Framework Analysis
 
-The root cause of the improvement opportunity is that while the core search functionality is solid, the tool lacks user convenience features that modern research tools expect. The absence of advanced filtering creates friction when working with large result sets, and limited export options reduce the tool's usefulness in existing workflows. Additionally, no session management means users lose their research context if they close the app.
+**Understand:** Local Deep Research users need better ways to filter large result sets, export findings in multiple formats, and persist their research sessions. Currently missing: (1) filtering UI for date/source/relevance, (2) export utilities for PDF/Markdown/JSON, (3) localStorage-based session persistence.
 
-### Proposed Solution
+**Match:** The codebase has:
+- `src/components/SearchResults.tsx` - where filter UI would be added
+- `src/utils/export.js` - existing export utilities that can be extended
+- `src/hooks/useSearch.ts` - search state management where session persistence logic belongs
+- Similar filtering patterns already exist in `src/components/AdvancedSearch.tsx`
 
-Implement three interconnected improvements:
-1. **Advanced Search Filters** - Add date range, source type, and relevance score filtering to the search interface
-2. **Multi-Format Export** - Support exporting research sessions as PDF, Markdown, and JSON
-3. **Session Persistence** - Save research sessions locally so users can resume work later
+**Plan:**
+1. Add filter component UI (date range picker, source type checkboxes, relevance slider) to SearchResults
+2. Implement filter logic in the search query handler to reduce result set
+3. Create export utilities for PDF (using `jspdf`), Markdown, and JSON formats
+4. Implement localStorage integration in useSearch hook to auto-save session state
+5. Add unit tests for filtering logic and export functions
+6. Update README with new feature documentation
 
-### Implementation Plan
+**Implement:** (Phase III—code branch: fix-issue-1495)
 
-Using UMPIRE framework:
+**Review:** 
+- Will follow project CONTRIBUTING.md conventions
+- Ensure all new code has TypeScript types
+- Add JSDoc comments for exported functions
+- Commit messages follow "feat: [component] description" pattern from project standards
 
-**Understand:** Users need better ways to filter, organize, and export their research findings to integrate Local Deep Research into existing workflows.
+**Evaluate:**
+- Test filtering: Verify filters correctly reduce results (unit tests)
+- Test export: Manually export in each format and validate file integrity
+- Test persistence: Close/reopen browser and confirm session state restored
+- Run existing test suite: `npm test` to ensure no regressions
+- Manual QA: Perform full research workflow with new features enabled
 
-**Match:** Similar tools like Notion and Obsidian implement filtered views, multi-format export, and session persistence. The codebase likely has existing data structures we can leverage.
+### Implementation Details
 
-**Plan:** 
-1. Add filter UI components to the search interface for date/source/relevance
-2. Implement filter logic in the search query handler
-3. Create export utilities for PDF, Markdown, and JSON formats
-4. Add localStorage integration for session persistence
-5. Update documentation with new features
-6. Add tests for filtering and export functionality
+**Files to Modify:**
+- `src/components/SearchResults.tsx` - Add filter UI component
+- `src/utils/export.js` - Extend with PDF/Markdown/JSON export functions
+- `src/hooks/useSearch.ts` - Add localStorage session persistence
+- `src/tests/export.test.js` - Add export utility tests
+- `src/tests/useSearch.test.js` - Add session persistence tests
+- `README.md` - Document new features
 
-**Implement:** [To be completed during Phase 2-3]
-
-**Review:** Follow project contribution guidelines, ensure code is well-tested and documented
-
-**Evaluate:** Test filtering with large datasets, verify exports render correctly, confirm session persistence across browser restarts
+**Root Cause Analysis:**
+The feature gaps exist because the tool was built as an MVP focused on core search functionality. As the user base grows, these UX conveniences (filtering, export, session persistence) have become priority requests. They're non-trivial but well-scoped improvements that follow existing patterns in the codebase.
 
 ---
 
 ## Testing Strategy
+
+- **Unit Tests:** Test filter logic with various dataset sizes; test export functions generate valid file formats
+- **Integration Tests:** Test filter + export workflow together; test session persistence across page reloads
+- **Manual QA:** End-to-end workflow with realistic research queries; verify UI feels natural and responsive
+- **Regression Tests:** Run full test suite to ensure existing functionality unaffected
+
+---
+
+## Summary
+
+✅ Environment set up and running  
+✅ Current limitations explored and documented  
+✅ Specific features mapped to codebase locations  
+✅ Implementation plan ready for Phase III  
+✅ Ready to begin development
 
 ### Unit Tests
 
